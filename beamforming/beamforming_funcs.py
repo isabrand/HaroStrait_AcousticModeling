@@ -1,3 +1,4 @@
+from networkx import center
 import arlpy.uwapm as pm
 import numpy as np
 import pandas as pd
@@ -62,7 +63,7 @@ def set_up_environment(field_depth, field_range, center_freq, freqs_checked, c_s
 
     print(f"Maximum receiver spacing to avoid spatial aliasing for center frequency {center_freq} Hz: {max_d} m")
     print(f"Fraunhofer distance for center frequency {center_freq} Hz: {ff_start} m")
-    print(f"There are {num_receivers} receivers in the array.")
+    print(f"There are {num_receivers} receivers in the array, spaced {d_spacing} m apart in depth.")
     #print(f"The receivers start with {depth_start} m depth and {range_start} m range, with a spacing of {d_spacing} m depth and {r_spacing} m range per hydrophone.")
     print(f"Receiver positions: {receiver_pos}")
 
@@ -229,7 +230,7 @@ def p_field_bellhop(source_pos, receiver_pos, ssp, bathy, bottom_reflection, fre
                 rx_depth=rec[1],
                 rx_range=source_pos[0]
             )
-            env['nbeams'] = 6001
+            #env['nbeams'] = 6001
 
             #pm.plot_env(env, width=900)    
             #pm.print_env(env)
@@ -441,6 +442,8 @@ def plot_beamformer(pt_pos_all, source_pos, B, search_ranges, search_depths, rec
     - receiver_pos: Receiver positions.
     """
 
+    success_matrix = [0, 0, 0]      # counts successes in terms of [bearing, depth, range]
+
     fig, axs = plt.subplots(num_depths, num_ranges, figsize=(6*num_ranges, 3*num_depths), sharex=True, sharey=True)
     if len(pt_pos_all) == 1: axs = np.array([axs])
     axs = axs.ravel()
@@ -463,7 +466,6 @@ def plot_beamformer(pt_pos_all, source_pos, B, search_ranges, search_depths, rec
         range_err = peak_range - pt_pos[0]
         depth_err = peak_depth - pt_pos[1]
         dist_err = np.sqrt(range_err**2 + depth_err**2)
-        print(f"Range error: {range_err:.2f} m, Depth error: {depth_err:.2f} m, Dist error: {dist_err:.2f} m")
         if np.abs(range_err) <= 150 and np.abs(depth_err) <= 20: outline_color = 'green'
         else: outline_color = 'red'
 
@@ -472,10 +474,20 @@ def plot_beamformer(pt_pos_all, source_pos, B, search_ranges, search_depths, rec
         cos_theta = (np.dot(v1, v2)) / (np.linalg.norm(v1) * np.linalg.norm(v2))
         angle_rad = np.arccos(np.clip(cos_theta, -1.0, 1.0))
         angle_deg = np.degrees(angle_rad)
-        print(f"Angle between source and peak: {angle_deg.item():.2f} degrees")
+        #print(f"Angle between source and peak: {angle_deg.item():.2f} degrees")
 
-        if angle_deg < 1: line_col = 'green'
+        oval_x_rad, oval_y_rad = (np.tan(np.deg2rad(3)) * pt_pos[0] * 2), (np.tan(np.deg2rad(3)) * pt_pos[0] / 4)
+        oval_x = pt_pos[0] + (oval_x_rad * np.cos(np.linspace(0, 2*np.pi, 100)))
+        oval_y = pt_pos[1] + (oval_y_rad * np.sin(np.linspace(0, 2*np.pi, 100)))
+        ax.plot(oval_x, oval_y, 'green', alpha=0.3)
+
+        if angle_deg < 1: 
+            line_col = 'green'
+            success_matrix[0] += 1
         else: line_col = 'red'
+        if np.abs(range_err) <= oval_x_rad: success_matrix[1] += 1
+        if np.abs(depth_err) <= oval_y_rad: success_matrix[2] += 1
+
 
         ax.plot([np.mean(receiver_pos[:,0]), pt_pos[0]], [np.mean(receiver_pos[:,1]), pt_pos[1]], color='black', linestyle='--', linewidth=1, label='Source to Receiver Path')
         ax.axline(xy1=(np.mean(receiver_pos[:,0]), np.mean(receiver_pos[:,1])), xy2=(peak_range, peak_depth), color=line_col, linestyle='--', linewidth=1)
@@ -485,8 +497,12 @@ def plot_beamformer(pt_pos_all, source_pos, B, search_ranges, search_depths, rec
         ax.scatter(peak_range, peak_depth, color='red', marker='x', label=f'Estimated Peak ({peak_range:0.0f} m, {peak_depth:0.0f} m)', s=120)
         ax.scatter(*receiver_pos.T, s=100, color='white', marker='.', label="Receivers")
 
+        ax.set_ylim(240, 0)
         fig.tight_layout(rect=[0, 0.03, 1, 0.95])
         fig.suptitle(title, fontsize=20)
+
+    count += 1
+    print(f"Success Matrix:\nB: {(success_matrix[0]/count*100):.2f}%\nR: {(success_matrix[1]/count*100):.2f}%\nD: {(success_matrix[2]/count*100):.2f}%\nT: {((success_matrix[0]/count*100)+(success_matrix[1]/count*100)+(success_matrix[2]/count*100)):.2f}")
 
     return peak_depth, peak_range, dist_err
 

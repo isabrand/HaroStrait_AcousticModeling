@@ -9,8 +9,27 @@ TDOA:
 at:
 
 beamforming:
+* beamforming_bellhop.ipynb
+* beamforming_clean.ipynb
+* beamforming_funcs.py
+* beamforming_functions.ipynb
+* beamforming_functions_k_matrices.ipynb
+* beamforming_method_comparison.ipynb
+* beamforming_method_comparison_k_matrices.ipynb
+* bellhop_model.ipynb
+* bellhop_testing.ipynb
 
 environmental_modelling:
+* bathymetry
+  * bathy_line_off_sanjuans_through_mooring.csv
+  * bathy_line_off_sanjuans_through_mooring_processed.csv
+  * haro_strait.grd
+  * sanjuan_cablepath.csv
+* haro0_2019.07.24_2019.12.25.nc
+* haro_strait_bathy_and_cable.ipynb
+* haro_strait_current_data.csv
+* haro_strait_filtered_data.csv
+* soundspeed_model.ipynb
 
 helpful_papers:
 

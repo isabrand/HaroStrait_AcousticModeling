@@ -5,8 +5,14 @@ This repo aims to model the acoustic environment for Haro Strait in order to des
 Folder and Code Organization:
 
 TDOA:
+* bathy_line_off_sanjuans_through_mooring_processed.csv
+* hor_tdoa.ipynb
+* S01.wav
+* vert_tdoa.ipynb
+* vert_tdoa_w_ambiguity.ipynb
+* vert_tdoa_w_bellhop.ipynb
 
-at:
+at: Suite of code necessary to run Bellhop simulations!
 
 beamforming:
 * beamforming_bellhop.ipynb
@@ -31,11 +37,9 @@ environmental_modelling:
 * haro_strait_filtered_data.csv
 * soundspeed_model.ipynb
 
-helpful_papers:
+helpful_papers: A collection of papers that I have found helpful for this work! Not at all complete, I have used probably hundreds of papers.
 
-mooring_design:
-
-S01.wav
+mooring_design: Mooring notes and details for the physical design. Not complete.
 
 
 

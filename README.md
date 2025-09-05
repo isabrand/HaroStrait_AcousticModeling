@@ -2,6 +2,8 @@ Haro Strait Acoustic Modeling
 
 This repo aims to model the acoustic environment for Haro Strait in order to design a localization algorithm for killer whales using a vertical hydrophone array. It explores methods of localization including TDOA and matched field processing beamforming. It uses bellhop as well as classic mathematical processing for signal arrivals at various receivers along the array.
 
+*** You will need to download BellHop in order to run any of this code. You can install the Acoustics Toolbox and then change the path at the beginning of some the files that use Bellhop to point to where you saved the BellHop directory. *** 
+
 Folder and Code Organization:
 
 TDOA:
@@ -11,8 +13,6 @@ TDOA:
 * vert_tdoa.ipynb
 * vert_tdoa_w_ambiguity.ipynb
 * vert_tdoa_w_bellhop.ipynb
-
-at: Suite of code necessary to run Bellhop simulations!
 
 beamforming:
 * beamforming_bellhop.ipynb
